@@ -20,6 +20,7 @@
 #include "usercontrol.h"
 #include "autonomous.h"
 #include "pre_auton.h"
+#include "otherfunctions.h"
 
 #define waitUntil(condition)                                                   \
   do {                                                                         \
