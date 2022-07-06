@@ -27,12 +27,12 @@ void usercontrol( void ) {
       Flywheel.stop(coast);
     }
     if(Controller1.ButtonA.pressing() && shooterstate == 0) {
-      Indexer.set(false);
+      Indexer.set(true);
       shooterstate = 1;
       shoottimer = Brain.timer(msec);
     }
     if(shooterstate == 1 && Brain.timer(msec)-shoottimer > shootingtime) {
-      Indexer.set(true);
+      Indexer.set(false);
       shooterstate = 2;
       shoottimer = Brain.timer(msec);
     }
@@ -40,7 +40,7 @@ void usercontrol( void ) {
       shooterstate = 0;
     }
     if(shooterstate == 0) {
-      Indexer.set(true);
+      Indexer.set(false);
     }
   }
 }
