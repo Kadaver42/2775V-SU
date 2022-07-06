@@ -9,6 +9,8 @@ extern motor_group DriveR;
 extern motor_group DriveL;
 extern controller Controller1;
 extern digital_out Indexer;
+extern inertial Gyro;
+extern encoder EncoderR;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

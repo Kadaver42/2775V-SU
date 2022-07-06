@@ -1,6 +1,7 @@
 #include "vex.h"
 
 void usercontrol( void ) {
+  vex::task positiontrackingtask = task(positionTrack);
   float throttle;
   float turn;
   float drivescalefactor = 0.09448818897;
