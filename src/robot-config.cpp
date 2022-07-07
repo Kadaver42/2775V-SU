@@ -20,6 +20,8 @@ motor_group DriveR = motor_group(DriveRMotorA, DriveRMotorB);
 motor DriveLMotorA = motor(PORT10, ratio6_1, true);
 motor DriveLMotorB = motor(PORT11, ratio6_1, true);
 motor_group DriveL = motor_group(DriveLMotorA, DriveLMotorB);
+encoder EncoderR = encoder(Brain.ThreeWirePort.C);
+inertial Gyro = inertial(PORT15);
 controller Controller1 = controller(primary);
 digital_out Indexer = digital_out(Brain.ThreeWirePort.A);
 
