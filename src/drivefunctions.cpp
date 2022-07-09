@@ -150,7 +150,6 @@ int positionTrack() { //Background thread used to position track full time.
 }
 
 void driveReset(float X, float Y, float OrientationDeg) { //Tells the robot its position on the field at the beginning of a match.
-  
   prevL = 0;
   prevR = 0;
   prevB = 0;
@@ -164,3 +163,89 @@ void driveReset(float X, float Y, float OrientationDeg) { //Tells the robot its 
   prevGlobalY = Y;
 }
 
+void straightdrive(float x, float y, float angle, float timeout, float kp = .04, float ki = .0008, float kd = .2, float turnp = .2, float maxvoltage = 11, float settlingerror = 3, float settlingtime = 20){
+  float starttime = Brain.timer(msec);
+  if(timeout == 0) { starttime = 99999999;}
+  bool settled = false;
+  float error = hypot(y-absGlobalY, x-absGlobalX);
+  float p = 0;
+  float i = 0;
+  float d = 0;
+  float output = 0;
+  float accerror = 0;
+  float preverror = error;
+  float settlecounter = 0;
+  float turn = 0;
+  float turnerror = 0;
+  while(settled == false && Brain.timer(msec) < starttime + timeout){
+    error = hypot(y-absGlobalY, x-absGlobalX);
+    p = error*kp;
+    i = accerror*ki;
+    d = (error-preverror)*kd;
+    output = p+i+d;
+    if(output>maxvoltage){
+      output = maxvoltage;
+    }
+    if(output<-maxvoltage){
+      output = -maxvoltage;
+    }
+    turnerror = reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-angle-Gyro.heading());
+    turn = turnp*turnerror;
+    setDriveVoltage(output+turn, output-turn);
+    if(error>100 || error<-100){
+      accerror = 0;
+    }else{
+      accerror += error;
+    }
+    preverror=error;
+    if(error < settlingerror && error > -settlingerror){
+      settlecounter+=1;
+    } else {
+      settlecounter = 0;
+    }
+    Brain.Screen.clearScreen();
+    Brain.Screen.printAt(50, 50, "%f", error);
+    if (settlecounter > settlingtime/20){
+      settled = true;
+    }
+    task::sleep(20);
+  }
+}
+
+void turn(float angle, float timeout = 0, float settlingerror = 1, float settlingtime = 40, float kp = .3, float ki = .01, float kd = 1, float maxvoltage = 12){
+  bool settled = false;
+  float error = angle - Gyro.heading(deg);
+  float starttime = Brain.timer(msec);
+  if(timeout == 0) { starttime = 99999999;}
+  float p = 0;
+  float i = 0;
+  float d = 0;
+  float output = 0;
+  float accerror = 0;
+  float preverror = error;
+  float settlecounter = 0;
+  while(settled == false && Brain.timer(msec) < starttime + timeout){
+    error = reduceAngleMinus180to180(angle - Gyro.heading(deg));
+    p = error*kp;
+    i = accerror*ki;
+    d = (error-preverror)*kd;
+    output = p+i+d;
+    setDriveVoltage(output, -output);
+    preverror=error;
+    if(output > 12){
+      accerror = 0;
+    }else{
+      accerror+=error;
+    }
+    if(error < settlingerror && error > -settlingerror){
+      settlecounter+=1;
+    } else {
+      settlecounter = 0;
+    }
+    if (settlecounter > settlingtime/20){
+      settled = true;
+    }
+    Brain.Screen.printAt(50, 50, "%f", error);
+    task::sleep(20);
+  }
+}
