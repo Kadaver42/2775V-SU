@@ -12,6 +12,7 @@ extern digital_out Indexer;
 extern inertial Gyro;
 extern encoder EncoderR;
 extern digital_out Endgame;
+extern optical opt;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

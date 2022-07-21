@@ -163,7 +163,7 @@ void driveReset(float X, float Y, float OrientationDeg) { //Tells the robot its 
   prevGlobalY = Y;
 }
 
-void straightdrive(float x, float y, float timeout, float kp, float ki, float kd, float turnp, float maxvoltage, float settlingerror, float settlingtime){
+void straightdrive(float x, float y, float timeout, float kp, float ki, float kd, float turnp, float turni, float turnd, float maxvoltage, float settlingerror, float settlingtime){
   float starttime = Brain.timer(msec);
   if(timeout == 0) { starttime = 99999999;}
   bool settled = false;
@@ -173,8 +173,11 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
   float d = 0;
   float output = 0;
   float accerror = 0;
+  float turnaccerror = 0;
   float preverror = error;
+  float turnpreverror = 0;
   float settlecounter = 0;
+  float turnscale = 1;
   float turn = 0;
   float turnerror = 0;
   while(settled == false && Brain.timer(msec) < starttime + timeout){
@@ -182,7 +185,8 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
     p = error*kp;
     i = accerror*ki;
     d = (error-preverror)*kd;
-    output = p+i+d;
+    turnscale = cos(reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-Gyro.heading()));
+    output = turnscale*(p+i+d);
     if(output>maxvoltage){
       output = maxvoltage;
     }
@@ -190,9 +194,11 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
       output = -maxvoltage;
     }
     turnerror = reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-Gyro.heading());
-    turn = turnp*turnerror;
+    turn = turnp*turnerror+turni*turnaccerror+turnd*(turnerror-turnpreverror);
+    turnpreverror=turnerror;
+    turnaccerror+=error;
     setDriveVoltage(output+turn, output-turn);
-    if(error>100 || error<-100){
+    if(output == maxvoltage || output == -maxvoltage){
       accerror = 0;
     }else{
       accerror += error;
@@ -234,7 +240,13 @@ void turn(float angle, float timeout, float settlingerror, float settlingtime, f
     output = p+i+d;
     setDriveVoltage(output, -output);
     preverror=error;
-    if(output > 12){
+    if(output>maxvoltage){
+      output = maxvoltage;
+    }
+    if(output<-maxvoltage){
+      output = -maxvoltage;
+    }
+    if(output == maxvoltage || output == -maxvoltage){
       accerror = 0;
     }else{
       accerror+=error;
