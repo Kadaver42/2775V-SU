@@ -163,7 +163,7 @@ void driveReset(float X, float Y, float OrientationDeg) { //Tells the robot its 
   prevGlobalY = Y;
 }
 
-void straightdrive(float x, float y, float angle, float timeout, float kp = .04, float ki = .0008, float kd = .2, float turnp = .2, float maxvoltage = 11, float settlingerror = 3, float settlingtime = 20){
+void straightdrive(float x, float y, float timeout, float kp, float ki, float kd, float turnp, float maxvoltage, float settlingerror, float settlingtime){
   float starttime = Brain.timer(msec);
   if(timeout == 0) { starttime = 99999999;}
   bool settled = false;
@@ -189,7 +189,7 @@ void straightdrive(float x, float y, float angle, float timeout, float kp = .04,
     if(output<-maxvoltage){
       output = -maxvoltage;
     }
-    turnerror = reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-angle-Gyro.heading());
+    turnerror = reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-Gyro.heading());
     turn = turnp*turnerror;
     setDriveVoltage(output+turn, output-turn);
     if(error>100 || error<-100){
@@ -204,15 +204,17 @@ void straightdrive(float x, float y, float angle, float timeout, float kp = .04,
       settlecounter = 0;
     }
     Brain.Screen.clearScreen();
-    Brain.Screen.printAt(50, 50, "%f", error);
+    Brain.Screen.printAt(100, 100, "%f", error);
     if (settlecounter > settlingtime/20){
       settled = true;
     }
     task::sleep(20);
   }
+  DriveL.stop(hold);
+  DriveR.stop(hold);
 }
 
-void turn(float angle, float timeout = 0, float settlingerror = 1, float settlingtime = 40, float kp = .3, float ki = .01, float kd = 1, float maxvoltage = 12){
+void turn(float angle, float timeout, float settlingerror, float settlingtime, float kp, float ki, float kd, float maxvoltage){
   bool settled = false;
   float error = angle - Gyro.heading(deg);
   float starttime = Brain.timer(msec);
@@ -248,4 +250,6 @@ void turn(float angle, float timeout = 0, float settlingerror = 1, float settlin
     Brain.Screen.printAt(50, 50, "%f", error);
     task::sleep(20);
   }
+  DriveL.stop(hold);
+  DriveR.stop(hold);
 }

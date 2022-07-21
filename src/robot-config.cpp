@@ -24,6 +24,8 @@ encoder EncoderR = encoder(Brain.ThreeWirePort.C);
 inertial Gyro = inertial(PORT15);
 controller Controller1 = controller(primary);
 digital_out Indexer = digital_out(Brain.ThreeWirePort.A);
+digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
+
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

@@ -11,6 +11,7 @@ extern controller Controller1;
 extern digital_out Indexer;
 extern inertial Gyro;
 extern encoder EncoderR;
+extern digital_out Endgame;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

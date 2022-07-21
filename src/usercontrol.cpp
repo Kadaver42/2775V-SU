@@ -2,6 +2,7 @@
 
 void usercontrol( void ) {
   vex::task positiontrackingtask = task(positionTrack);
+  //vex::task bangbangcontrol = task(bangbangcontroller);
   float throttle;
   float turn;
   float drivescalefactor = 0.09448818897;
@@ -13,6 +14,14 @@ void usercontrol( void ) {
 
     setDriveVoltage(throttle+turn,throttle-turn);
 
+    if(Controller1.ButtonUp.pressing() && (Controller1.ButtonLeft.pressing()) && (Controller1.ButtonDown.pressing()) && (Controller1.ButtonRight.pressing())){
+    Endgame.set(true);
+    }
+
+    else{
+    Endgame.set(false);
+    }
+
     if (Controller1.ButtonR1.pressing()) {
       Intake.spin(fwd, 100, pct);
     } else if (Controller1.ButtonR2.pressing()) {
@@ -21,12 +30,12 @@ void usercontrol( void ) {
       Intake.stop(coast);
     }
     if (Controller1.ButtonL1.pressing()) {
-      Flywheel.spin(fwd, 12, volt);
+      velcontroller(100);
     } else if (Controller1.ButtonL2.pressing()) {
-      Flywheel.spin(fwd, 8.5, volt);
+     
     } else {
-      Flywheel.stop(coast);
-    }
+     velcontroller(0);
+     }
     if(Controller1.ButtonA.pressing() && shooterstate == 0) {
       Indexer.set(false);
       shooterstate = 1;
