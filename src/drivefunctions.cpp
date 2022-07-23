@@ -150,17 +150,13 @@ int positionTrack() { //Background thread used to position track full time.
 }
 
 void driveReset(float X, float Y, float OrientationDeg) { //Tells the robot its position on the field at the beginning of a match.
-  prevL = 0;
-  prevR = 0;
-  prevB = 0;
+  prevGlobalX=X;
+  prevGlobalY=Y;
+  absGlobalX=X;
+  absGlobalY=Y;
+  prevOrientationRad=OrientationDeg*pi/180;
 
-  updatePosition();
-
-  prevGlobalX = 0;
-  prevGlobalY = 0;
-
-  prevGlobalX = X;
-  prevGlobalY = Y;
+  Gyro.setHeading(OrientationDeg, deg);
 }
 
 void straightdrive(float x, float y, float timeout, float kp, float ki, float kd, float turnp, float turni, float turnd, float maxvoltage, float settlingerror, float settlingtime){
@@ -180,12 +176,15 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
   float turnscale = 1;
   float turn = 0;
   float turnerror = 0;
+  float turnerrorRad = 0;
   while(settled == false && Brain.timer(msec) < starttime + timeout){
     error = hypot(y-absGlobalY, x-absGlobalX);
     p = error*kp;
     i = accerror*ki;
     d = (error-preverror)*kd;
-    turnscale = cos(reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-Gyro.heading()));
+    turnerror = reduceAngleMinus180to180(180/pi*(atan2(x-absGlobalX,y-absGlobalY))-absOrientationDeg);
+    turnerrorRad = turnerror/180*pi;
+    turnscale = cos(turnerrorRad);
     output = turnscale*(p+i+d);
     if(output>maxvoltage){
       output = maxvoltage;
@@ -193,7 +192,9 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
     if(output<-maxvoltage){
       output = -maxvoltage;
     }
-    turnerror = reduceAngleMinus180to180(atan2(y-absGlobalY,x-absGlobalX)-Gyro.heading());
+    if (turnerror>90) {turnerror-=180;}
+    if (turnerror<-90) {turnerror+=180;}
+    if (error<settlingerror) {turnerror = 0;}
     turn = turnp*turnerror+turni*turnaccerror+turnd*(turnerror-turnpreverror);
     turnpreverror=turnerror;
     turnaccerror+=error;
@@ -210,7 +211,7 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
       settlecounter = 0;
     }
     Brain.Screen.clearScreen();
-    Brain.Screen.printAt(100, 100, "%f", error);
+    Brain.Screen.printAt(100, 100, "%f", turnerror);
     if (settlecounter > settlingtime/20){
       settled = true;
     }
@@ -238,14 +239,62 @@ void turn(float angle, float timeout, float settlingerror, float settlingtime, f
     i = accerror*ki;
     d = (error-preverror)*kd;
     output = p+i+d;
-    setDriveVoltage(output, -output);
-    preverror=error;
     if(output>maxvoltage){
       output = maxvoltage;
     }
     if(output<-maxvoltage){
       output = -maxvoltage;
     }
+    setDriveVoltage(output, -output);
+    preverror=error;
+    
+    if(output == maxvoltage || output == -maxvoltage){
+      accerror = 0;
+    }else{
+      accerror+=error;
+    }
+    if(error < settlingerror && error > -settlingerror){
+      settlecounter+=1;
+    } else {
+      settlecounter = 0;
+    }
+    if (settlecounter > settlingtime/20){
+      settled = true;
+    }
+    Brain.Screen.printAt(50, 50, "%f", error);
+    task::sleep(20);
+  }
+  DriveL.stop(hold);
+  DriveR.stop(hold);
+}
+
+void turntopoint(float x, float y, float timeout, float settlingerror, float settlingtime, float kp, float ki, float kd, float maxvoltage){
+  bool settled = false;
+  float error = reduceAngleMinus180to180(180/pi*(atan2(x-absGlobalX,y-absGlobalY))-absOrientationDeg);
+  float starttime = Brain.timer(msec);
+  if(timeout == 0) { starttime = 99999999;}
+  float p = 0;
+  float i = 0;
+  float d = 0;
+  float output = 0;
+  float accerror = 0;
+  float preverror = error;
+  float settlecounter = 0;
+  while(settled == false && Brain.timer(msec) < starttime + timeout){
+    error = reduceAngleMinus180to180(180/pi*(atan2(x-absGlobalX,y-absGlobalY))-absOrientationDeg);
+    p = error*kp;
+    i = accerror*ki;
+    d = (error-preverror)*kd;
+    output = p+i+d;
+    if(output>maxvoltage){
+      output = maxvoltage;
+    }
+    if(output<-maxvoltage){
+      output = -maxvoltage;
+    }
+    setDriveVoltage(output, -output);
+    preverror=error;
+    
     if(output == maxvoltage || output == -maxvoltage){
       accerror = 0;
     }else{

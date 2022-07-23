@@ -21,6 +21,7 @@
 #include "autonomous.h"
 #include "pre_auton.h"
 #include "otherfunctions.h"
+#include "auto_runs.h"
 
 #define waitUntil(condition)                                                   \
   do {                                                                         \
