@@ -2,7 +2,7 @@
 
 void usercontrol( void ) {
   vex::task positiontrackingtask = task(positionTrack);
-  //vex::task bangbangcontrol = task(bangbangcontroller);
+  vex::task bangbangcontrol = task(bangbangcontroller);
   float throttle;
   float turn;
   float drivescalefactor = 0.09448818897;
@@ -30,7 +30,7 @@ void usercontrol( void ) {
       Intake.stop(coast);
     }
     if (Controller1.ButtonL1.pressing()) {
-      velcontroller(100);
+      velcontroller(70);
     } else if (Controller1.ButtonL2.pressing()) {
      
     } else {

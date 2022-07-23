@@ -4,7 +4,7 @@
 #define BLUE 1
 
 float shootingtime = 400;
-float unshootingtime = 200;
+float unshootingtime = 400;
 
 float flywheelVelocity = 0;
 
@@ -57,14 +57,28 @@ int getColor(){
 }
 
 int rollerSpin(bool color, float speed, float timeout, float extraspin){
+  if (color == RED) {
   float starttime = Brain.timer(msec);
+  while( !getColor() == color && Brain.timer(msec)-starttime < timeout){
+    Intake.spin(fwd, speed, pct);
+  }
   while( getColor() == color && Brain.timer(msec)-starttime < timeout){
-    Intake.spin(fwd, speed, pct);
+    Intake.spin(fwd, speed/2, pct);
   }
-  while( getColor() != color && Brain.timer(msec)-starttime < timeout){
-    Intake.spin(fwd, speed, pct);
-  }
+  Intake.stop(hold);
   Intake.rotateFor(fwd, extraspin, deg, false);
+  }
+  if (color == BLUE) {
+  float starttime = Brain.timer(msec);
+  while( getColor() == RED && Brain.timer(msec)-starttime < timeout){
+    Intake.spin(fwd, speed, pct);
+  }
+  while( (!getColor() == RED) && Brain.timer(msec)-starttime < timeout){
+    Intake.spin(fwd, speed/2, pct);
+  }
+  Intake.stop(hold);
+  Intake.rotateFor(fwd, extraspin, deg, false);
+  }
   return 0;
 }
 

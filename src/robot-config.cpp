@@ -25,7 +25,7 @@ inertial Gyro = inertial(PORT15);
 controller Controller1 = controller(primary);
 digital_out Indexer = digital_out(Brain.ThreeWirePort.A);
 digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
-optical opt(PORT13);
+optical opt(PORT2);
 
 
 // VEXcode generated functions
