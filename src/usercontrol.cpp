@@ -1,5 +1,9 @@
 #include "vex.h"
 
+void driveto0(){
+straightdrive(0,0);
+}
+
 void usercontrol( void ) {
   vex::task positiontrackingtask = task(positionTrack);
   vex::task bangbangcontrol = task(bangbangcontroller);
@@ -13,6 +17,13 @@ void usercontrol( void ) {
     turn = drivescalefactor*Controller1.Axis1.value();
 
     setDriveVoltage(throttle+turn,throttle-turn);
+
+    Controller1.ButtonX.pressed(driveto0);
+
+    if(Controller1.ButtonB.pressing()){
+    rollerSpin();
+    
+    }
 
     if(Controller1.ButtonUp.pressing() && (Controller1.ButtonLeft.pressing()) && (Controller1.ButtonDown.pressing()) && (Controller1.ButtonRight.pressing())){
     Endgame.set(true);

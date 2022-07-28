@@ -159,7 +159,7 @@ void driveReset(float X, float Y, float OrientationDeg) { //Tells the robot its 
   Gyro.setHeading(OrientationDeg, deg);
 }
 
-void straightdrive(float x, float y, float timeout, float kp, float ki, float kd, float turnp, float turni, float turnd, float maxvoltage, float settlingerror, float settlingtime){
+void straightdrive(float x, float y, float timeout, float kp, float ki, float kd, float turnp, float turni, float turnd, float maxvoltage, float turnmaxvoltage, float settlingerror, float settlingtime){
   float starttime = Brain.timer(msec);
   if(timeout == 0) { starttime = 99999999;}
   bool settled = false;
@@ -196,6 +196,14 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
     if (turnerror<-90) {turnerror+=180;}
     if (error<settlingerror) {turnerror = 0;}
     turn = turnp*turnerror+turni*turnaccerror+turnd*(turnerror-turnpreverror);
+
+    if(turn>maxvoltage){
+      turn = maxvoltage;
+    }
+    if(turn<-maxvoltage){
+      turn = -maxvoltage;
+    }
+  
     turnpreverror=turnerror;
     turnaccerror+=error;
     setDriveVoltage(output+turn, output-turn);

@@ -16,4 +16,4 @@ void turn(float angle, float timeout = 0, float settlingerror = 1, float settlin
 
 void turntopoint(float x, float y, float timeout = 0, float settlingerror = .5, float settlingtime = 1000, float kp = 1, float ki = .00, float kd = 2.5, float maxvoltage = 5);
 
-void straightdrive(float x, float y, float timeout = 0, float kp = 1, float ki = 0, float kd = 0, float turnp = 1, float turni = 0, float turnd = 0, float maxvoltage = 8, float settlingerror = .5, float settlingtime = 1000);
+void straightdrive(float x, float y, float timeout = 0, float kp = 1, float ki = 0, float kd = 0, float turnp = 1, float turni = 0, float turnd = 2.5, float maxvoltage = 10, float turnmaxvoltage = 2, float settlingerror = .5, float settlingtime = 1000);

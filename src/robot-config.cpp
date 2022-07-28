@@ -26,6 +26,8 @@ controller Controller1 = controller(primary);
 digital_out Indexer = digital_out(Brain.ThreeWirePort.A);
 digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
 optical opt(PORT2);
+bumper Up = bumper(Brain.ThreeWirePort.F);
+bumper Down = bumper(Brain.ThreeWirePort.G);
 
 
 // VEXcode generated functions
