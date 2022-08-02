@@ -1,22 +1,21 @@
 #include "vex.h"
 
+
+
 void autonomous(void) {
-if(currentselection == 1){
- LeftRollerAuto();
+  switch(currentselection){
+ case 1:
+  fifteenSkillsAuto();
+  break;
+ case 2:
+  leftAuto();
+  break;
+ case 3:
+  rightAuto();
+  break;
+ case 4:
+  WPAuto();
+  break;
 }
-
-else if(currentselection == 2){
-
-}
-
-else if(currentselection == 3){
-
-}
-
-else if(currentselection == 4){
-
-}
-
-else{} 
 
 }

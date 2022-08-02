@@ -3,12 +3,12 @@
 #define RED 0
 #define BLUE 1
 
-float shootingtime = 400;
-float unshootingtime = 400;
+float shootingtime = 250;
+float unshootingtime = 350;
 
 float flywheelVelocity = 0;
 
-float kP = .2;
+float kP = .13;
 float kI = 0;
 float kD = 0;
 float kF = .12;
@@ -29,8 +29,13 @@ while(true){
  power = (error *kP + integral * kI + derivative * kD + target * kF);
 
  prevError = error;
-
+ if (target == 0){
+   Flywheel.stop(coast);
+ }
+ 
+ else {
  Flywheel.spin(fwd, power, volt);
+ }
 
  vex::task::sleep(20);
  }
@@ -40,9 +45,6 @@ while(true){
 
 void velcontroller(double vel){
  target = vel;
- if(target == 0){
- Flywheel.stop(coast);
- }
 }
 
 int getColor(){
@@ -66,20 +68,22 @@ int rollerSpin(bool color, float speed, float timeout, float extraspin){
     Intake.spin(fwd, speed/2, pct);
   }
   Intake.stop(hold);
-  Intake.rotateFor(fwd, extraspin, deg, false);
+  Intake.rotateFor(fwd, extraspin, deg, speed, velocityUnits::pct, false);
   }
   if (color == BLUE) {
   float starttime = Brain.timer(msec);
   while( getColor() == RED && Brain.timer(msec)-starttime < timeout){
     Intake.spin(fwd, speed, pct);
   }
-  while( (!getColor() == RED) && Brain.timer(msec)-starttime < timeout){
+  while( ((!getColor()) == RED) && Brain.timer(msec)-starttime < timeout){
     Intake.spin(fwd, speed/2, pct);
   }
   Intake.stop(hold);
-  Intake.rotateFor(fwd, extraspin, deg, false);
+  Intake.rotateFor(fwd, extraspin, deg, speed, velocityUnits::pct, false);
   }
   return 0;
 }
+
+
 
 

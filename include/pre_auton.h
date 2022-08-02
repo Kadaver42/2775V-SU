@@ -1,2 +1,3 @@
 void pre_auton(void);
-int currentselection = 0;
+
+extern int currentselection;

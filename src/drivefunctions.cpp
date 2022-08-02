@@ -229,6 +229,81 @@ void straightdrive(float x, float y, float timeout, float kp, float ki, float kd
   DriveR.stop(hold);
 }
 
+void aligndrive(float x, float y, float finalorientation, float timeout, float kp, float ki, float kd, float angleagression, float turnp, float turni, float turnd, float maxvoltage, float turnmaxvoltage, float settlingerror, float settlingtime){
+  float starttime = Brain.timer(msec);
+  if(timeout == 0) { starttime = 99999999;}
+  bool settled = false;
+  float error = hypot(y-absGlobalY, x-absGlobalX);
+  float p = 0;
+  float i = 0;
+  float d = 0;
+  float output = 0;
+  float accerror = 0;
+  float turnaccerror = 0;
+  float preverror = error;
+  float turnpreverror = 0;
+  float settlecounter = 0;
+  float turnscale = 1;
+  float turn = 0;
+  float turnerror = 0;
+  float turnerrorRad = 0;
+  float sideerror = 0;
+  while(settled == false && Brain.timer(msec) < starttime + timeout){
+    error = hypot(y-absGlobalY, x-absGlobalX);
+    p = error*kp;
+    i = accerror*ki;
+    d = (error-preverror)*kd;
+    turnerror = reduceAngleMinus180to180(180/pi*(atan2(x-absGlobalX,y-absGlobalY))-absOrientationDeg);
+    turnerrorRad = turnerror/180*pi;
+    turnscale = cos(turnerrorRad);
+    
+    output = turnscale*(p+i+d); 
+    if(output>maxvoltage){
+      output = maxvoltage;
+    }
+    if(output<-maxvoltage){
+      output = -maxvoltage;
+    }
+    turnerror = reduceAngleMinus180to180(180/pi*(atan2(x-absGlobalX,y-absGlobalY))-finalorientation);
+    turnerrorRad = turnerror/180*pi;
+    sideerror = error*sin(turnerrorRad);
+    if (output < 0) {sideerror = -sideerror;}
+    turnerror = reduceAngleMinus180to180(angleagression*sideerror-absOrientationDeg);
+    if (error<settlingerror) {turnerror = 0;}
+    turn = turnp*turnerror+turni*turnaccerror+turnd*(turnerror-turnpreverror);
+
+    if(turn>maxvoltage){
+      turn = maxvoltage;
+    }
+    if(turn<-maxvoltage){
+      turn = -maxvoltage;
+    }
+  
+    turnpreverror=turnerror;
+    turnaccerror+=error;
+    setDriveVoltage(output+turn, output-turn);
+    if(output == maxvoltage || output == -maxvoltage){
+      accerror = 0;
+    }else{
+      accerror += error;
+    }
+    preverror=error;
+    if(error < settlingerror && error > -settlingerror){
+      settlecounter+=1;
+    } else {
+      settlecounter = 0;
+    }
+    Brain.Screen.clearScreen();
+    Brain.Screen.printAt(100, 100, "%f", turnerror);
+    if (settlecounter > settlingtime/20){
+      settled = true;
+    }
+    task::sleep(20);
+  }
+  DriveL.stop(hold);
+  DriveR.stop(hold);
+}
+
 void turn(float angle, float timeout, float settlingerror, float settlingtime, float kp, float ki, float kd, float maxvoltage){
   bool settled = false;
   float error = angle - Gyro.heading(deg);

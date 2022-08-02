@@ -13,8 +13,7 @@ extern inertial Gyro;
 extern encoder EncoderR;
 extern digital_out Endgame;
 extern optical opt;
-extern bumper Up;
-extern bumper Down;
+extern bumper Cycle;
 extern bumper Confirm;
 
 /**

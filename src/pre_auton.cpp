@@ -1,16 +1,48 @@
 #include "vex.h"
 
+int currentselection = 0;
+
+bool autonSelector = true;
+
 void pre_auton(){
 Indexer.set(true);
 
-Brain.Screen.printAt(1,100,"Current Selection: %f",currentselection);
+while(autonSelector){
 
-if(Up.pressing()){
- currentselection --;
+Brain.Screen.clearScreen();
+
+switch(currentselection){
+ case 0:
+  Brain.Screen.printAt(50, 50, "No Auto");
+  break;
+ case 1:
+  Brain.Screen.printAt(50, 50, "Skills");
+  break;
+ case 2:
+  Brain.Screen.printAt(50, 50, "Left");
+  break;
+ case 3:
+  Brain.Screen.printAt(50, 50, "Right");
+  break;
+ case 4:
+  Brain.Screen.printAt(50, 50, "AWP");
+  break;
 }
 
-else if(Down.pressing()){
+
+if(Cycle.pressing()){
+  while(Cycle.pressing()) {}
  currentselection ++;
 }
 
+else if(Confirm.pressing()){
+ autonSelector = false;
+}
+
+else if(currentselection == 5){
+ currentselection = 0;
+}
+task::sleep(100);
+
+ }
 }

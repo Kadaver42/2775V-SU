@@ -17,7 +17,7 @@ motor_group Intake = motor_group(IntakeMotorA, IntakeMotorB);
 motor DriveRMotorA = motor(PORT20, ratio6_1, false);
 motor DriveRMotorB = motor(PORT12, ratio6_1, false);
 motor_group DriveR = motor_group(DriveRMotorA, DriveRMotorB);
-motor DriveLMotorA = motor(PORT10, ratio6_1, true);
+motor DriveLMotorA = motor(PORT14, ratio6_1, true);
 motor DriveLMotorB = motor(PORT11, ratio6_1, true);
 motor_group DriveL = motor_group(DriveLMotorA, DriveLMotorB);
 encoder EncoderR = encoder(Brain.ThreeWirePort.C);
@@ -26,8 +26,8 @@ controller Controller1 = controller(primary);
 digital_out Indexer = digital_out(Brain.ThreeWirePort.A);
 digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
 optical opt(PORT2);
-bumper Up = bumper(Brain.ThreeWirePort.F);
-bumper Down = bumper(Brain.ThreeWirePort.G);
+bumper Cycle = bumper(Brain.ThreeWirePort.H);
+bumper Confirm = bumper(Brain.ThreeWirePort.G);
 
 
 // VEXcode generated functions
